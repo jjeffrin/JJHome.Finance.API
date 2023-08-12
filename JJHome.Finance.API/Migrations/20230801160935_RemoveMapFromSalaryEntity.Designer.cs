@@ -4,6 +4,7 @@ using JJHome.Finance.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JJHome.Finance.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230801160935_RemoveMapFromSalaryEntity")]
+    partial class RemoveMapFromSalaryEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,9 +46,10 @@ namespace JJHome.Finance.API.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DESCRIPTION");
 
-                    b.Property<int>("ExpenseTypeId")
-                        .HasColumnType("int")
-                        .HasColumnName("EXPENSETYPEID");
+                    b.Property<string>("Type1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("TYPE1");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2")
@@ -58,43 +62,22 @@ namespace JJHome.Finance.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExpenseTypeId");
+                    b.HasIndex("Type1");
 
                     b.ToTable("EXPENSES");
                 });
 
             modelBuilder.Entity("JJHome.Finance.Models.ExpenseType", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("CREATED_AT");
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(450)")
+                        .HasColumnName("TYPE");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DESCRIPTION");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("NAME");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("UPDATED_AT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("USER_ID");
-
-                    b.HasKey("Id");
+                    b.HasKey("Type");
 
                     b.ToTable("EXPENSETYPES");
                 });
@@ -158,7 +141,7 @@ namespace JJHome.Finance.API.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("nvarchar(450)")
                         .HasColumnName("NAME");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -172,61 +155,10 @@ namespace JJHome.Finance.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("ORGANIZATIONS");
-                });
-
-            modelBuilder.Entity("JJHome.Finance.Models.Salary", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("ID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("AmountPerMonth")
-                        .HasColumnType("decimal(18,2)")
-                        .HasColumnName("AMOUNTPERMONTH");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("CREATED_AT");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("DISCRIMINATOR");
-
-                    b.Property<DateTime>("EffectiveFrom")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("EFFECTIVEFROM");
-
-                    b.Property<DateTime>("EffectiveTo")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("EFFECTIVETO");
-
-                    b.Property<int>("OrganizationId")
-                        .HasColumnType("int")
-                        .HasColumnName("ORGANIZATIONID");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("UPDATED_AT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("USER_ID");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrganizationId");
-
-                    b.ToTable("SALARIES");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Salary");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("JJHome.Finance.Models.Saving", b =>
@@ -317,44 +249,15 @@ namespace JJHome.Finance.API.Migrations
                     b.ToTable("SUBSCRIPTIONS");
                 });
 
-            modelBuilder.Entity("JJHome.Finance.Models.SalaryCorrection", b =>
-                {
-                    b.HasBaseType("JJHome.Finance.Models.Salary");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("DESCRIPTION");
-
-                    b.ToTable("SALARIES");
-
-                    b.HasDiscriminator().HasValue("SalaryCorrection");
-                });
-
             modelBuilder.Entity("JJHome.Finance.Models.Expense", b =>
                 {
-                    b.HasOne("JJHome.Finance.Models.ExpenseType", "ExpenseType")
-                        .WithMany("Expenses")
-                        .HasForeignKey("ExpenseTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ExpenseType");
-                });
-
-            modelBuilder.Entity("JJHome.Finance.Models.Salary", b =>
-                {
-                    b.HasOne("JJHome.Finance.Models.Organization", "Organization")
+                    b.HasOne("JJHome.Finance.Models.ExpenseType", "Type")
                         .WithMany()
-                        .HasForeignKey("OrganizationId")
+                        .HasForeignKey("Type1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Organization");
-                });
-
-            modelBuilder.Entity("JJHome.Finance.Models.ExpenseType", b =>
-                {
-                    b.Navigation("Expenses");
+                    b.Navigation("Type");
                 });
 #pragma warning restore 612, 618
         }
