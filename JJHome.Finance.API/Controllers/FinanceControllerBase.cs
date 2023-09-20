@@ -29,6 +29,21 @@ namespace JJHome.Finance.API.Controllers
             return await _dbSet.ToListAsync();
         }
 
+        // GET: api/user@mail.com
+        [HttpGet("GetByUserId/{userId}")]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public virtual async Task<ActionResult<IEnumerable<T>>> GetByUserId(string userId)
+        {
+            if (_dbSet == null)
+            {
+                return NotFound();
+            }
+
+            IQueryable<T> entityUserIdQuery = _dbSet.Where(x => x.UserId.Equals(userId));
+            return await entityUserIdQuery.ToListAsync();
+        }
+
         // GET: api/Organizations/5
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
