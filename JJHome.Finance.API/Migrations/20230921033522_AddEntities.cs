@@ -6,29 +6,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace JJHome.Finance.API.Migrations
 {
     /// <inheritdoc />
-    public partial class AddedMultipleEntities : Migration
+    public partial class AddEntities : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "NAME",
-                table: "ORGANIZATIONS",
-                type: "nvarchar(450)",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
-
             migrationBuilder.CreateTable(
                 name: "EXPENSETYPES",
                 columns: table => new
                 {
-                    TYPE = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DESCRIPTION = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    NAME = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DESCRIPTION = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CREATED_AT = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UPDATED_AT = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    USER_ID = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EXPENSETYPES", x => x.TYPE);
+                    table.PrimaryKey("PK_EXPENSETYPES", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -51,30 +48,19 @@ namespace JJHome.Finance.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SALARIES",
+                name: "ORGANIZATIONS",
                 columns: table => new
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AMOUNTPERMONTH = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    EFFECTIVEFROM = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EFFECTIVETO = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ORGANIZATIONID = table.Column<int>(type: "int", nullable: false),
-                    DISCRIMINATOR = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DESCRIPTION = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NAME = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CREATED_AT = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UPDATED_AT = table.Column<DateTime>(type: "datetime2", nullable: false),
                     USER_ID = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SALARIES", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_SALARIES_ORGANIZATIONS_ORGANIZATIONID",
-                        column: x => x.ORGANIZATIONID,
-                        principalTable: "ORGANIZATIONS",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_ORGANIZATIONS", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -121,8 +107,9 @@ namespace JJHome.Finance.API.Migrations
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TYPE1 = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    EXPENSETYPEID = table.Column<int>(type: "int", nullable: false),
                     AMOUNT = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DESCRIPTION = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CREATED_AT = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UPDATED_AT = table.Column<DateTime>(type: "datetime2", nullable: false),
                     USER_ID = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -131,23 +118,43 @@ namespace JJHome.Finance.API.Migrations
                 {
                     table.PrimaryKey("PK_EXPENSES", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_EXPENSES_EXPENSETYPES_TYPE1",
-                        column: x => x.TYPE1,
+                        name: "FK_EXPENSES_EXPENSETYPES_EXPENSETYPEID",
+                        column: x => x.EXPENSETYPEID,
                         principalTable: "EXPENSETYPES",
-                        principalColumn: "TYPE",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SALARIES",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DESCRIPTION = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AMOUNTPERMONTH = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EFFECTIVEFROM = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EFFECTIVETO = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ORGANIZATIONID = table.Column<int>(type: "int", nullable: false),
+                    CREATED_AT = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UPDATED_AT = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    USER_ID = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SALARIES", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_SALARIES_ORGANIZATIONS_ORGANIZATIONID",
+                        column: x => x.ORGANIZATIONID,
+                        principalTable: "ORGANIZATIONS",
+                        principalColumn: "ID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ORGANIZATIONS_NAME",
-                table: "ORGANIZATIONS",
-                column: "NAME",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EXPENSES_TYPE1",
+                name: "IX_EXPENSES_EXPENSETYPEID",
                 table: "EXPENSES",
-                column: "TYPE1");
+                column: "EXPENSETYPEID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SALARIES_ORGANIZATIONID",
@@ -176,17 +183,8 @@ namespace JJHome.Finance.API.Migrations
             migrationBuilder.DropTable(
                 name: "EXPENSETYPES");
 
-            migrationBuilder.DropIndex(
-                name: "IX_ORGANIZATIONS_NAME",
-                table: "ORGANIZATIONS");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "NAME",
-                table: "ORGANIZATIONS",
-                type: "nvarchar(max)",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(450)");
+            migrationBuilder.DropTable(
+                name: "ORGANIZATIONS");
         }
     }
 }

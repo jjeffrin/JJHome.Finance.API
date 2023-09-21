@@ -7,11 +7,15 @@ namespace JJHome.Finance.API.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-
+            // NOTE!: ENABLE THE FOLLOWING CODE IN THE CONSTRUCTOR, IF YOU NEED TO DEBUG ONMODELCREATING OR SIMILAR METHODS WHEN RUNNING THE 'UPDATE-DATABASE' COMMAND
+            //if (System.Diagnostics.Debugger.IsAttached == false)
+            //{
+            //    System.Diagnostics.Debugger.Launch();
+            //}
         }
+
         public DbSet<Organization> Organizations { get; set; }
         public DbSet<Salary> Salaries { get; set; }
-        public DbSet<SalaryCorrection> SalaryCorrections { get; set; }
         public DbSet<ExpenseType> ExpenseTypes { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<Loan> Loans { get; set; }

@@ -15,7 +15,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration["ConnectionString:LocalConnection"]);
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DevelopmentConnection"));
 });
 
 builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>

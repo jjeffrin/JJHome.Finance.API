@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JJHome.Finance.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230803153852_EntityCorrections2")]
-    partial class EntityCorrections2
+    [Migration("20230921033522_AddEntities")]
+    partial class AddEntities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -195,10 +195,9 @@ namespace JJHome.Finance.API.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("CREATED_AT");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)")
-                        .HasColumnName("DISCRIMINATOR");
+                        .HasColumnName("DESCRIPTION");
 
                     b.Property<DateTime>("EffectiveFrom")
                         .HasColumnType("datetime2")
@@ -226,10 +225,6 @@ namespace JJHome.Finance.API.Migrations
                     b.HasIndex("OrganizationId");
 
                     b.ToTable("SALARIES");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Salary");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("JJHome.Finance.Models.Saving", b =>
@@ -318,19 +313,6 @@ namespace JJHome.Finance.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SUBSCRIPTIONS");
-                });
-
-            modelBuilder.Entity("JJHome.Finance.Models.SalaryCorrection", b =>
-                {
-                    b.HasBaseType("JJHome.Finance.Models.Salary");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("DESCRIPTION");
-
-                    b.ToTable("SALARIES");
-
-                    b.HasDiscriminator().HasValue("SalaryCorrection");
                 });
 
             modelBuilder.Entity("JJHome.Finance.Models.Expense", b =>
