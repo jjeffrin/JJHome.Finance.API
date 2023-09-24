@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JJHome.Finance.Models\JJHome.Finance.Models.csproj" />
+    <ProjectReference Include="..\JJHome.Finance.Utilities\JJHome.Finance.Utilities.csproj" />
   </ItemGroup>
 
   <ItemGroup>
